@@ -1,3 +1,6 @@
+import random
+
+
 def find_pacman(map):
     pacman_x = -1
     pacman_y = -1
@@ -58,10 +61,24 @@ def play(map, key):
         return True, True, False
 
 
-
 def is_a_wall(map, next_x, next_y):
     is_a_wall = map[next_x][next_y] == '|' or map[next_x][next_y] == '-'
     return is_a_wall
+
+
+def is_a_ghost(map, next_x, next_y):
+    is_a_ghost = map[next_x][next_y] == 'G'
+    return is_a_ghost
+
+
+def is_a_pill(map, next_x, next_y):
+    is_a_pill = map[next_x][next_y] == 'P'
+    return is_a_pill
+
+
+def is_pacman(map, next_x, next_y):
+    is_pacman = map[next_x][next_y] == '@'
+    return is_pacman
 
 
 def within_borders(map, next_x, next_y):
@@ -99,6 +116,66 @@ def next_position(map, key):
         next_x = x + 1
         next_y = y
     return next_x, next_y
+
+
+def find_ghosts(map):
+    all_ghosts = []
+    for x in range(len(map)):
+        for y in range(len(map[x])):
+            if map[x][y] == 'G':
+                all_ghosts.append([x, y])
+    return all_ghosts
+
+
+def move_ghosts(map):
+    all_ghosts = find_ghosts(map)
+    for ghost in all_ghosts:
+        ghost_x = ghost[0]
+        ghost_y = ghost[1]
+
+        possible_directions = [
+            [ghost_x, ghost_y + 1],
+            [ghost_x, ghost_y - 1],
+            [ghost_x - 1, ghost_y],
+            [ghost_x + 1, ghost_y]
+        ]
+
+        # select a random possible movement
+        # and get the x, y of the movement
+        random_number = random.randint(0, 3)
+        next_ghost_x = possible_directions[random_number][0]
+        next_ghost_y = possible_directions[random_number][1]
+
+        # checks before actually moving it
+        if not within_borders(map, next_ghost_x, next_ghost_y):
+            continue
+
+        if is_a_wall(map, next_ghost_x, next_ghost_y):
+            continue
+
+        if is_a_ghost(map, next_ghost_x, next_ghost_y):
+            continue
+
+        if is_a_pill(map, next_ghost_x, next_ghost_y):
+            continue
+
+        if is_pacman(map, next_ghost_x, next_ghost_y):
+            return True
+
+        # move the ghost to the random position
+        everything_to_the_left = map[ghost_x][0:ghost_y]
+        everything_to_the_right = map[ghost_x][ghost_y + 1:]
+        map[ghost_x] = everything_to_the_left + "." + everything_to_the_right
+
+        everything_to_the_left = map[next_ghost_x][0:next_ghost_y]
+        everything_to_the_right = map[next_ghost_x][next_ghost_y + 1:]
+        map[next_ghost_x] = everything_to_the_left + "G" + everything_to_the_right
+
+        return False
+
+
+
+
 
 
 

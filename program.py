@@ -1,4 +1,4 @@
-from pacman import play
+from pacman import play, move_ghosts
 from ui import *
 
 # @ -> our hero
@@ -22,7 +22,9 @@ while not game_finished:
     key = ui_key()
     vali_kay, pacman_alive, won = play(map, key)
 
-    if not pacman_alive:
+    pacman_was_hit = move_ghosts(map)
+
+    if (not pacman_alive) or pacman_was_hit:
         ui_msg_lost()
         game_finished = True
     elif won:
